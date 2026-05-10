@@ -1,0 +1,134 @@
+name: TESTING PAYLOAD
+description: ""
+trigger: manual
+trigger_data: {}
+environment: {}
+keywords: []
+run_as: self
+steps:
+    - name: windows
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: AMD_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.exe
+        payload_type: pikka
+        selected_os: Windows
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false
+    - name: macOS
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: AMD_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.bin
+        payload_type: pikka
+        selected_os: macOS
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false
+    - name: linux
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: AMD_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.elf
+        payload_type: pikka
+        selected_os: Linux
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false
+    - name: windows-arm
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: ARM_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.exe
+        payload_type: pikka
+        selected_os: Windows
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false
+    - name: macOS-arm
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: ARM_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.bin
+        payload_type: pikka
+        selected_os: macOS
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false
+    - name: linux-arm
+      description: ""
+      depends_on: []
+      action: payload_create
+      action_data:
+        build_parameters:
+            - name: output_type
+              value: ARM_x64
+        c2_profiles:
+            - c2_profile: http
+              c2_profile_parameters:
+                callback_host: http://c2.lab.ludus
+        commands: []
+        description: ""
+        filename: pikka.elf
+        payload_type: pikka
+        selected_os: Linux
+      environment: {}
+      inputs: {}
+      outputs: {}
+      continue_on_error: false

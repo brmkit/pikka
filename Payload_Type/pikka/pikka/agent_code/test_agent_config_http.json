@@ -1,0 +1,13 @@
+{
+  "AESPSK": "",
+  "callback_host": "http://172.16.1.47",
+  "callback_interval": 2,
+  "callback_jitter": 23,
+  "callback_port": 80,
+  "encrypted_exchange_check": true,
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
+  },
+  "killdate": "2027-01-21",
+  "post_uri": "data"
+}
