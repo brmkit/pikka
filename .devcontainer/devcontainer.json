@@ -2,12 +2,9 @@
 	"name": "pikka-dev",
 	"image": "golang:1.25-bookworm",
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {},
-		"ghcr.io/tailscale/codespace/tailscale": {
-			"version": "latest"
-		}
+		"ghcr.io/devcontainers/features/common-utils:2": {}
 	},
-	"onCreateCommand": "apt update && apt install software-properties-common build-essential git protobuf-compiler -y && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest &&go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest &&  git config --global user.email 'brmk' && git config --global user.name 'brmk'",
+	"onCreateCommand": "apt update && apt install software-properties-common build-essential git protobuf-compiler -y && go install google.golang.org/protobuf/cmd/protoc-gen-go@latest &&go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest",
 	"customizations": {
 		"vscode": {
 			"extensions": [
