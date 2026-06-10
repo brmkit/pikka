@@ -33,6 +33,6 @@ Additional capabilities on top of the base poseidon command set, tested on Linux
 
 ### disclaimer
 
-Yes, this repository is developed with AI support. Sometimes with local models for minimal tasks (testing usage patterns and optimizations, minor fix), sometimes with frontier models for heavier lifting (code generation, documentation, debugging). The design, direction, and review are mine, the AI is just a tool in the process.
+Yes, this repository is developed with AI support. Sometimes with local models for minimal tasks (testing usage patterns and optimizations, minor fix), sometimes with frontier models for heavier lifting (code generation, documentation, troubleshooting). The design, direction, and review are mine, the AI is just a very cool tool in the process.
 
-I'm not looking for anyone's approval on this. It's just honest to say it.
+_It's just honest to say it._
