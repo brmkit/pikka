@@ -10,7 +10,7 @@ It started as a fork of [poseidon](https://github.com/MythicAgents/poseidon), wh
 
 The goal? A minimal, multiplatform agent that I can use during testing, training and labs.
 
-## installation
+### installation
 
 If you want to get this running in your Mythic instance, it's pretty standard. Use the `mythic-cli`:
 
@@ -21,7 +21,18 @@ If you want to get this running in your Mythic instance, it's pretty standard. U
 Once it's installed, just start it up:
 `sudo ./mythic-cli start pikka`
 
+### capabilities
 
+Additional capabilities on top of the base poseidon command set, tested on Linux and Windows:
 
-### todo
-- bof execution for windows
+- **tsconnect**: embeds a Tailscale node in userspace via tsnet, joining a tailnet without a running daemon. Supports ephemeral nodes, custom control servers (headscale), exit node advertisement, and subnet route advertising.
+- **objload**: in-memory object file loader and executor. On Windows, loads COFF/BOF and PE files via goffloader. On Linux/macOS, loads ELF BOF files via a built-in ELF loader with Beacon API compatibility layer (based on TrustedSec's ELFLoader).
+- **execute_assembly**: reflectively loads and executes .NET assemblies in-memory using the CLR. Windows only.
+- **exit**: terminates the agent with self-deletion. On Windows, renames the binary to an ADS and deletes it. On Linux/macOS, forks a cleanup process before exiting.
+- **ldapsearch**: executes LDAP queries against a directory service and returns results in raw and structured formats. Supports custom base DN, filters, and attribute selection.
+
+### disclaimer
+
+Yes, this repository is developed with AI support. Sometimes with local models for minimal tasks (testing usage patterns and optimizations, minor fix), sometimes with frontier models for heavier lifting (code generation, documentation, troubleshooting). The design, direction, and review are mine, the AI is just a very cool tool in the process.
+
+_It's just honest to say it._

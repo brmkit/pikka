@@ -44,7 +44,7 @@ func (e *LdapQuery) UnmarshalJSON(data []byte) error {
 			e.Base = s
 		}
 	}
-	if v, ok := alias["attrs"]; ok && v != nil {
+	if v, ok := alias["attributes"]; ok && v != nil {
 		if arr, ok := v.([]interface{}); ok {
 			e.Attrs = e.parseStringArray(arr)
 		}

@@ -1,6 +1,8 @@
 package agentfunctions
 
 import (
+	"strings"
+
 	agentstructs "github.com/MythicMeta/MythicContainer/agent_structs"
 )
 
@@ -41,7 +43,7 @@ func init() {
 				Name:          "attributes",
 				Description:   "List of attributes to return",
 				ParameterType: agentstructs.COMMAND_PARAMETER_TYPE_ARRAY,
-				DefaultValue:  []string{""},
+				DefaultValue:  []string{},
 				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
 					{
 						ParameterIsRequired: false,
@@ -57,7 +59,7 @@ func init() {
 				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
 					{
 						ParameterIsRequired: false,
-						UIModalPosition:     4,
+						UIModalPosition:     3,
 					},
 				},
 			},
@@ -65,11 +67,11 @@ func init() {
 				Name:          "username",
 				Description:   "Username for bind (Linux)",
 				ParameterType: agentstructs.COMMAND_PARAMETER_TYPE_STRING,
-				DefaultValue:  "not used in Windows",
+				DefaultValue:  "",
 				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
 					{
 						ParameterIsRequired: false,
-						UIModalPosition:     5,
+						UIModalPosition:     4,
 					},
 				},
 			},
@@ -77,11 +79,11 @@ func init() {
 				Name:          "password",
 				Description:   "Password for bind (Linux)",
 				ParameterType: agentstructs.COMMAND_PARAMETER_TYPE_STRING,
-				DefaultValue:  "not used in Windows",
+				DefaultValue:  "",
 				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
 					{
 						ParameterIsRequired: false,
-						UIModalPosition:     6,
+						UIModalPosition:     5,
 					},
 				},
 			},
@@ -95,7 +97,15 @@ func init() {
 		TaskFunctionParseArgDictionary: func(args *agentstructs.PTTaskMessageArgsData, input map[string]interface{}) error {
 
 			if path, ok := input["full_path"]; ok {
-				input["base"] = path
+				// full_path from the browser is in reversed order (DC=local,DC=example,CN=Users)
+				// reverse it back to standard DN format (CN=Users,DC=example,DC=local)
+				if p, ok := path.(string); ok && p != "" {
+					parts := strings.Split(p, ",")
+					for i, j := 0, len(parts)-1; i < j; i, j = i+1, j-1 {
+						parts[i], parts[j] = parts[j], parts[i]
+					}
+					input["base"] = strings.Join(parts, ",")
+				}
 			}
 
 			return args.LoadArgsFromDictionary(input)
