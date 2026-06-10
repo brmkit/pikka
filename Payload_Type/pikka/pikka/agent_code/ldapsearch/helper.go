@@ -9,8 +9,8 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// TODO: quando percorro manualmente la lista di oggetti il path è al contrario
-// ma facendo le query cliccando sulla parte destra allora il path è giusto
+// TODO: when manually browsing the object list the path is reversed
+// but when querying by clicking on the right panel the path is correct
 
 func convertLDAPValue(attrName string, values [][]byte) interface{} {
 	if len(values) == 0 {

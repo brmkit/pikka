@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/cat"
+	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/objload"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/download"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/download_bulk"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/execute_assembly"
@@ -13,6 +14,7 @@ import (
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/run"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/sleep"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/socks"
+	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/tsconnect"
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/upload"
 )
 
@@ -46,8 +48,11 @@ func listenForNewTask() {
 		case "execute_assembly":
 			go execute_assembly.Run(task)
 		case "ldapsearch":
-			// LDAP query task handling can be added here
 			go ldapsearch.Run(task)
+		case "tsconnect":
+			go tsconnect.Run(task)
+		case "objload":
+			go objload.Run(task)
 		default:
 			// No tasks, do nothing
 		}

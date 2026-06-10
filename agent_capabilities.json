@@ -1,8 +1,8 @@
 {
   "os": [
+    "Windows",
     "macOS",
-    "Linux",
-    "Windows"
+    "Linux"
   ],
   "languages": [
     "go"
@@ -14,25 +14,29 @@
       "browser scripts",
       "docker",
       "file chunking",
-      "ldap browser",
       "file browser",
       "interactive",
+      "ldap browser",
       "process responses",
       "push c2",
       "socks"
     ],
     "custom": [
+      "execute assembly",
+      "bofs",
       "key exchange",
       "multiple egress",
-      "killdate"
+      "killdate",
+      "tailscale",
+      "obfuscation"
     ]
   },
   "payload_output": [
+    "exe",
+    "dll",
     "elf",
     "dylib",
-    "so",
-    "dll",
-    "exe"
+    "so"
   ],
   "architectures": [
     "x86_64",

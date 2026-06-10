@@ -97,7 +97,8 @@ func resolveLDAPServer() (string, error) {
 		return dc, nil
 	}
 
-	return "", fmt.Errorf("no LDAP server context available")
+	// fallback to LOGONSERVER
+	return strings.ToLower(logon + "." + domain), nil
 }
 
 func ldapBind(conn *ldap.Conn, args *LdapQuery) error {
