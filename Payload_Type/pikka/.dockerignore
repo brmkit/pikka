@@ -1,0 +1,7 @@
+main
+*.o
+*.exe
+*.bin
+*.nix.bin
+*.mac.bin
+*.md

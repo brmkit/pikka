@@ -11,11 +11,8 @@ WEBHOOK_DEFAULT_CALLBACK_CHANNEL?=
 WEBHOOK_DEFAULT_STARTUP_CHANNEL?=
 
 build:
-	go mod download 
-	go mod tidy
 	go build -o ${BINARY_NAME} .
 	cp ${BINARY_NAME} /
-	cd ./pikka/agent_code && go mod download && go mod tidy && cd ../..
 
 
 run:
