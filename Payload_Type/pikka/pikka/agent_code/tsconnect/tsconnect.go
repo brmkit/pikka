@@ -17,47 +17,14 @@ import (
 )
 
 type Arguments struct {
-	Action         string `json:"action"`
-	AuthKey        string `json:"auth_key"`
-	Hostname       string `json:"hostname"`
-	StateDir       string `json:"state_dir"`
-	Ephemeral      bool   `json:"ephemeral"`
-	ControlURL     string `json:"control_url"`
+	Action          string `json:"action"`
+	AuthKey         string `json:"auth_key"`
+	Hostname        string `json:"hostname"`
+	StateDir        string `json:"state_dir"`
+	Ephemeral       bool   `json:"ephemeral"`
+	ControlURL      string `json:"control_url"`
 	AdvertiseRoutes string `json:"advertise_routes"`
-	AllowLANAccess bool   `json:"allow_lan_access"`
-}
-
-func (e *Arguments) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["action"]; ok {
-		e.Action = v.(string)
-	}
-	if v, ok := alias["auth_key"]; ok {
-		e.AuthKey = v.(string)
-	}
-	if v, ok := alias["hostname"]; ok {
-		e.Hostname = v.(string)
-	}
-	if v, ok := alias["state_dir"]; ok {
-		e.StateDir = v.(string)
-	}
-	if v, ok := alias["ephemeral"]; ok {
-		e.Ephemeral = v.(bool)
-	}
-	if v, ok := alias["control_url"]; ok {
-		e.ControlURL = v.(string)
-	}
-	if v, ok := alias["advertise_routes"]; ok {
-		e.AdvertiseRoutes = v.(string)
-	}
-	if v, ok := alias["allow_lan_access"]; ok {
-		e.AllowLANAccess = v.(bool)
-	}
-	return nil
+	AllowLANAccess  bool   `json:"allow_lan_access"`
 }
 
 var (
@@ -174,8 +141,14 @@ func stopServer(task structs.Task) {
 		return
 	}
 
+	stateDir := tsServer.Dir
 	err := tsServer.Close()
 	tsServer = nil
+
+	if stateDir != "" {
+		os.RemoveAll(stateDir)
+	}
+
 	if err != nil {
 		errResp := task.NewResponse()
 		errResp.SetError(fmt.Sprintf("Error stopping Tailscale node: %s", err.Error()))
@@ -283,10 +256,22 @@ func configureExitNode(task structs.Task, args Arguments) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	routes := []netip.Prefix{
-		netip.MustParsePrefix("0.0.0.0/0"),
-		netip.MustParsePrefix("::/0"),
+	v4Default, err := netip.ParsePrefix("0.0.0.0/0")
+	if err != nil {
+		errResp := task.NewResponse()
+		errResp.SetError(fmt.Sprintf("Failed to parse default IPv4 route: %s", err.Error()))
+		task.Job.SendResponses <- errResp
+		return
 	}
+	v6Default, err := netip.ParsePrefix("::/0")
+	if err != nil {
+		errResp := task.NewResponse()
+		errResp.SetError(fmt.Sprintf("Failed to parse default IPv6 route: %s", err.Error()))
+		task.Job.SendResponses <- errResp
+		return
+	}
+
+	routes := []netip.Prefix{v4Default, v6Default}
 
 	if args.AdvertiseRoutes != "" {
 		for _, cidr := range strings.Split(args.AdvertiseRoutes, ",") {
