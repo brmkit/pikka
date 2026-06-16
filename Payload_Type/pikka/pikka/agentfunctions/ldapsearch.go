@@ -87,6 +87,30 @@ func init() {
 					},
 				},
 			},
+			{
+				Name:          "use_tls",
+				Description:   "Use LDAPS (TLS) instead of plaintext LDAP",
+				ParameterType: agentstructs.COMMAND_PARAMETER_TYPE_BOOLEAN,
+				DefaultValue:  false,
+				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
+					{
+						ParameterIsRequired: false,
+						UIModalPosition:     6,
+					},
+				},
+			},
+			{
+				Name:          "skip_verify",
+				Description:   "Skip TLS certificate verification (use with self-signed certs)",
+				ParameterType: agentstructs.COMMAND_PARAMETER_TYPE_BOOLEAN,
+				DefaultValue:  false,
+				ParameterGroupInformation: []agentstructs.ParameterGroupInfo{
+					{
+						ParameterIsRequired: false,
+						UIModalPosition:     7,
+					},
+				},
+			},
 		},
 		CommandAttributes: agentstructs.CommandAttribute{
 			SupportedOS: []string{},
