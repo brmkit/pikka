@@ -8,47 +8,10 @@ import (
 )
 
 type Arguments struct {
-	FileID     string
-	Mode       string
-	Args       []string
-	EntryPoint string
-}
-
-func (a *Arguments) parseStringArray(arr []interface{}) []string {
-	result := make([]string, len(arr))
-	for i, v := range arr {
-		result[i] = v.(string)
-	}
-	return result
-}
-
-func (a *Arguments) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["file_name"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			a.FileID = s
-		}
-	}
-	if v, ok := alias["mode"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			a.Mode = s
-		}
-	}
-	if v, ok := alias["args"]; ok && v != nil {
-		if arr, ok := v.([]interface{}); ok {
-			a.Args = a.parseStringArray(arr)
-		}
-	}
-	if v, ok := alias["entry_point"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			a.EntryPoint = s
-		}
-	}
-	return nil
+	FileID     string   `json:"file_name"`
+	Mode       string   `json:"mode"`
+	Args       []string `json:"args"`
+	EntryPoint string   `json:"entry_point"`
 }
 
 func Run(task structs.Task) {

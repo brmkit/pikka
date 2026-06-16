@@ -5,12 +5,17 @@ package objload
 /*
 #cgo linux LDFLAGS: -ldl
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <dlfcn.h>
+
+#if defined(__linux__)
+#include "libc_symtab.h"
+#endif
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__)
 #define INTERNAL_DEFAULT_LIBRARY ((void*) -2)
@@ -250,15 +255,48 @@ static beacon_func_entry_t _beacon_functions[] = {
 #define BEACON_FUNC_COUNT 17
 
 // === Symbol Resolution ===
+// _libc_symbols[] and LIBC_SYM_COUNT are defined in libc_symtab.h
 
 static void* _resolve_symbol(const char* symbolName) {
 	int i;
+	void* sym;
 	for (i = 0; i < BEACON_FUNC_COUNT; i++) {
 		if (strcmp(symbolName, _beacon_functions[i].functionName) == 0) {
 			return _beacon_functions[i].function;
 		}
 	}
-	return dlsym(INTERNAL_DEFAULT_LIBRARY, symbolName);
+	sym = dlsym(INTERNAL_DEFAULT_LIBRARY, symbolName);
+	if (sym) return sym;
+#if defined(__linux__)
+	{
+		int j;
+		for (j = 0; j < (int)LIBC_SYM_COUNT; j++) {
+			if (strcmp(symbolName, _libc_symbols[j].name) == 0) {
+				return _libc_symbols[j].addr;
+			}
+		}
+	}
+	// RTLD_NOLOAD fallback for symbols not in the compile-time table.
+	{
+		static void* _dso_handles[4] = {NULL};
+		static int _tried = 0;
+		if (!_tried) {
+			_tried = 1;
+			_dso_handles[0] = dlopen(NULL, RTLD_NOW);
+			_dso_handles[1] = dlopen("libc.so.6", RTLD_NOW | RTLD_NOLOAD);
+			_dso_handles[2] = dlopen("libm.so.6", RTLD_NOW | RTLD_NOLOAD);
+			_dso_handles[3] = dlopen("libpthread.so.0", RTLD_NOW | RTLD_NOLOAD);
+		}
+		int j;
+		for (j = 0; j < 4; j++) {
+			if (_dso_handles[j]) {
+				sym = dlsym(_dso_handles[j], symbolName);
+				if (sym) return sym;
+			}
+		}
+	}
+#endif
+	return NULL;
 }
 
 // === BOF Entry Point Calling ===
