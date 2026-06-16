@@ -27,7 +27,7 @@ Additional capabilities on top of the base poseidon command set, tested on Linux
 
 - **tsconnect**: embeds a Tailscale node in userspace via tsnet, joining a tailnet without a running daemon. Supports ephemeral nodes, custom control servers (headscale), exit node advertisement, and subnet route advertising.
 - **objload**: in-memory object file loader and executor. On Windows, loads COFF/BOF and PE files via goffloader. On Linux/macOS, loads ELF BOF files via a built-in ELF loader with Beacon API compatibility layer (based on TrustedSec's ELFLoader).
-- **execute_assembly**: reflectively loads and executes .NET assemblies in-memory using the CLR. Windows only.
+- ~~**execute_assembly**: reflectively loads and executes .NET assemblies in-memory using the CLR. Windows only.~~ (WIP)
 - **exit**: terminates the agent with self-deletion. On Windows, renames the binary to an ADS and deletes it. On Linux/macOS, forks a cleanup process before exiting.
 - **ldapsearch**: executes LDAP queries against a directory service and returns results in raw and structured formats. Supports custom base DN, filters, and attribute selection.
 

@@ -9,36 +9,8 @@ import (
 )
 
 type Arguments struct {
-	FileID string
-	Args   []string
-}
-
-func (e *Arguments) parseStringArray(configArray []interface{}) []string {
-	urls := make([]string, len(configArray))
-	for l, p := range configArray {
-		urls[l] = p.(string)
-	}
-	return urls
-}
-func (e *Arguments) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["assembly_name"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			e.FileID = s
-		}
-	}
-
-	if v, ok := alias["args"]; ok && v != nil {
-		if arr, ok := v.([]interface{}); ok {
-			e.Args = e.parseStringArray(arr)
-		}
-	}
-
-	return nil
+	FileID string   `json:"assembly_name"`
+	Args   []string `json:"args"`
 }
 
 func Run(task structs.Task) {
