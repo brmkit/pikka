@@ -3,7 +3,9 @@
 package exit
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func selfDelete() error {
@@ -11,5 +13,14 @@ func selfDelete() error {
 	if err != nil {
 		return err
 	}
-	return os.Remove(exePath)
+
+	exePath, err = filepath.EvalSymlinks(exePath)
+	if err != nil {
+		return fmt.Errorf("failed to resolve executable path: %w", err)
+	}
+
+	if err := os.Remove(exePath); err != nil {
+		return fmt.Errorf("failed to delete executable: %w", err)
+	}
+	return nil
 }
