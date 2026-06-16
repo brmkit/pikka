@@ -13,36 +13,9 @@ import (
 )
 
 type Arguments struct {
-	Path        string
-	Args        []string
-	Environment []string
-}
-
-func (e *Arguments) parseStringArray(configArray []interface{}) []string {
-	urls := make([]string, len(configArray))
-	if configArray != nil {
-		for l, p := range configArray {
-			urls[l] = p.(string)
-		}
-	}
-	return urls
-}
-func (e *Arguments) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["path"]; ok {
-		e.Path = v.(string)
-	}
-	if v, ok := alias["args"]; ok {
-		e.Args = e.parseStringArray(v.([]interface{}))
-	}
-	if v, ok := alias["env"]; ok {
-		e.Environment = e.parseStringArray(v.([]interface{}))
-	}
-	return nil
+	Path        string   `json:"path"`
+	Args        []string `json:"args"`
+	Environment []string `json:"env"`
 }
 
 // Run - Function that executes the run command

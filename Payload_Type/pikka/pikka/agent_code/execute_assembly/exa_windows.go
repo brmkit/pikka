@@ -12,11 +12,9 @@ import (
 	clr "github.com/Ne0nd0g/go-clr"
 )
 
+// Known limitation: go-clr LoadCLR may fail on the first invocation per process lifetime.
+// If CLR loading fails, retry the command - disabled for debugging.
 func executeAssembly(exebytes []byte, args []string) (string, string) {
-	// TODO: i need to change this method because go-clr has some issues
-	// LoadCLR:  works only on second attempt, why?
-
-	// actual implementation taken from -> https://github.com/Ne0nd0g/go-clr/blob/master/examples/EXEfromMemory/EXEfromMemory.go
 
 	err := clr.RedirectStdoutStderr()
 	if err != nil {

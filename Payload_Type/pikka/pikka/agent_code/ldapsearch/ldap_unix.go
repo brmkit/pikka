@@ -10,8 +10,8 @@ import (
 	"github.com/go-ldap/ldap/v3"
 )
 
-// TODO: implement bind with kerberos - use user context if possible
-
+// Limitation: Linux only supports simple bind with explicit credentials.
+// Kerberos/GSSAPI bind is available on Windows via SSPI.
 func ldapBind(conn *ldap.Conn, args *LdapQuery) error {
 	if args.Username == "" || args.Password == "" {
 		return fmt.Errorf("explicit credentials required on linux")

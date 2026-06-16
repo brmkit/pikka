@@ -70,34 +70,9 @@ func zipFilesAndDirectories(paths []string) (*bytes.Buffer, error) {
 	return &buffer, nil
 }
 
-// Define a struct to parse parameters
 type Arguments struct {
-	Paths    []string // List of file or directory paths
-	Compress bool     // Option to compress the files/directories
-}
-
-func (e *Arguments) parseStringArray(configArray []interface{}) []string {
-	urls := make([]string, len(configArray))
-	if configArray != nil {
-		for l, p := range configArray {
-			urls[l] = p.(string)
-		}
-	}
-	return urls
-}
-func (e *Arguments) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["paths"]; ok {
-		e.Paths = e.parseStringArray(v.([]interface{}))
-	}
-	if v, ok := alias["compress"]; ok {
-		e.Compress = v.(bool)
-	}
-	return nil
+	Paths    []string `json:"paths"`
+	Compress bool     `json:"compress"`
 }
 
 // Run - Function that executes the download task

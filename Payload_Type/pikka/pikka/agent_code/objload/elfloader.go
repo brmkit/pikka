@@ -25,6 +25,7 @@ const (
 	shtSymtab   uint32 = 2
 	shtStrtab   uint32 = 3
 	shtRela     uint32 = 4
+	shtNobits   uint32 = 8
 
 	shfExecInstr uint64 = 0x4
 	shfInfoLink  uint64 = 0x40
@@ -148,13 +149,15 @@ func (l *elfLoader) load() error {
 		}
 		l.sectionProt[i] = prot
 
-		if sh.Size > 0 && sh.Type == shtProgbits {
+		if sh.Size > 0 && (sh.Type == shtProgbits || sh.Type == shtNobits) {
 			l.sectionMaps[i], err = syscall.Mmap(-1, 0, int(sh.Size),
 				syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_PRIVATE|syscall.MAP_ANON)
 			if err != nil {
 				return fmt.Errorf("failed to map section %d: %w", i, err)
 			}
-			copy(l.sectionMaps[i], l.data[sh.Offset:sh.Offset+sh.Size])
+			if sh.Type == shtProgbits {
+				copy(l.sectionMaps[i], l.data[sh.Offset:sh.Offset+sh.Size])
+			}
 		}
 
 		switch sh.Type {
@@ -395,10 +398,17 @@ func packBOFArgs(args []string) ([]byte, error) {
 }
 
 func utf16LEEncode(s string) []byte {
-	runes := []rune(s)
-	out := make([]byte, len(runes)*2)
-	for i, r := range runes {
-		binary.LittleEndian.PutUint16(out[i*2:], uint16(r))
+	var buf bytes.Buffer
+	for _, r := range s {
+		if r >= 0x10000 {
+			r -= 0x10000
+			high := 0xD800 + (r>>10)&0x3FF
+			low := 0xDC00 + r&0x3FF
+			binary.Write(&buf, binary.LittleEndian, uint16(high))
+			binary.Write(&buf, binary.LittleEndian, uint16(low))
+		} else {
+			binary.Write(&buf, binary.LittleEndian, uint16(r))
+		}
 	}
-	return out
+	return buf.Bytes()
 }

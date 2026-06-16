@@ -1,70 +1,27 @@
 package ldapsearch
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"net"
 	"strings"
+	"time"
 
 	"github.com/MythicAgents/pikka/Payload_Type/pikka/agent_code/pkg/utils/structs"
 	"github.com/go-ldap/ldap/v3"
 )
 
-func (e *LdapQuery) parseStringArray(configArray []interface{}) []string {
-	urls := make([]string, len(configArray))
-	for l, p := range configArray {
-		urls[l] = p.(string)
-	}
-	return urls
-}
-
 type LdapQuery struct {
-	Query     string
-	Base      string
-	Attrs     []string
-	SizeLimit int
-	// not windows
-	Username string
-	Password string
-	Server   string
-}
-
-func (e *LdapQuery) UnmarshalJSON(data []byte) error {
-	alias := map[string]interface{}{}
-	err := json.Unmarshal(data, &alias)
-	if err != nil {
-		return err
-	}
-	if v, ok := alias["query"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			e.Query = s
-		}
-	}
-	if v, ok := alias["base"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			e.Base = s
-		}
-	}
-	if v, ok := alias["attributes"]; ok && v != nil {
-		if arr, ok := v.([]interface{}); ok {
-			e.Attrs = e.parseStringArray(arr)
-		}
-	}
-	if v, ok := alias["limit"]; ok && v != nil {
-		if f, ok := v.(float64); ok {
-			e.SizeLimit = int(f)
-		}
-	}
-	if v, ok := alias["username"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			e.Username = s
-		}
-	}
-	if v, ok := alias["password"]; ok && v != nil {
-		if s, ok := v.(string); ok {
-			e.Password = s
-		}
-	}
-	return nil
+	Query      string   `json:"query"`
+	Base       string   `json:"base"`
+	Attrs      []string `json:"attributes"`
+	SizeLimit  int      `json:"limit"`
+	Username   string   `json:"username"`
+	Password   string   `json:"password"`
+	Server     string   `json:"server"`
+	UseTLS     bool     `json:"use_tls"`
+	SkipVerify bool     `json:"skip_verify"`
 }
 
 func Run(task structs.Task) {
@@ -97,7 +54,18 @@ func Run(task structs.Task) {
 
 	args.Server = server
 
-	conn, err := ldap.DialURL("ldap://" + server)
+	var conn *ldap.Conn
+	dialer := net.Dialer{Timeout: 10 * time.Second}
+
+	if args.UseTLS {
+		tlsConfig := &tls.Config{
+			ServerName:         server,
+			InsecureSkipVerify: args.SkipVerify,
+		}
+		conn, err = ldap.DialURL("ldaps://"+server, ldap.DialWithDialer(&dialer), ldap.DialWithTLSConfig(tlsConfig))
+	} else {
+		conn, err = ldap.DialURL("ldap://"+server, ldap.DialWithDialer(&dialer))
+	}
 	if err != nil {
 		msg.SetError(err.Error())
 		task.Job.SendResponses <- msg
