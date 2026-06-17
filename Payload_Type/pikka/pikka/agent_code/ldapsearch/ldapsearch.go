@@ -77,8 +77,10 @@ func Run(task structs.Task) {
 		conn, connErr = ldap.DialURL("ldaps://"+args.Server, ldap.DialWithDialer(&dialer), ldap.DialWithTLSConfig(tlsConfig))
 	} else {
 		conn, connErr = ldap.DialURL("ldap://"+args.Server, ldap.DialWithDialer(&dialer))
-		if connErr == nil {
-			connErr = conn.StartTLS(tlsConfig)
+		// StartTLS required on Win2025 (signing enforced) - fallback to plain for older DCs
+		if connErr == nil && conn.StartTLS(tlsConfig) != nil {
+			conn.Close()
+			conn, connErr = ldap.DialURL("ldap://"+args.Server, ldap.DialWithDialer(&dialer))
 		}
 	}
 	if connErr != nil {
