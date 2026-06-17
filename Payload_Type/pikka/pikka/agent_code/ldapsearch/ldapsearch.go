@@ -44,30 +44,45 @@ func Run(task structs.Task) {
 		args.SizeLimit = 0 // default limit
 	}
 
-	// extract dc information from environment
-	server, err := resolveLDAPServer()
-	if err != nil {
-		msg.SetError(fmt.Sprintf("Failed to resolve LDAP server: %s", err.Error()))
-		task.Job.SendResponses <- msg
-		return
+	if args.Server == "" {
+		server, err := resolveLDAPServer()
+		if err != nil {
+			// fallback: derive domain from base DN (e.g. "DC=red,DC=local" -> "red.local")
+			if domain := domainFromBaseDN(args.Base); domain != "" {
+				if dc, dcErr := detectDC(domain); dcErr == nil && dc != "" {
+					server = dc
+				} else {
+					server = domain
+				}
+			}
+			if server == "" {
+				msg.SetError(fmt.Sprintf("Failed to resolve LDAP server: %s", err.Error()))
+				task.Job.SendResponses <- msg
+				return
+			}
+		}
+		args.Server = server
 	}
-
-	args.Server = server
 
 	var conn *ldap.Conn
+	var connErr error
 	dialer := net.Dialer{Timeout: 10 * time.Second}
 
-	if args.UseTLS {
-		tlsConfig := &tls.Config{
-			ServerName:         server,
-			InsecureSkipVerify: args.SkipVerify,
-		}
-		conn, err = ldap.DialURL("ldaps://"+server, ldap.DialWithDialer(&dialer), ldap.DialWithTLSConfig(tlsConfig))
-	} else {
-		conn, err = ldap.DialURL("ldap://"+server, ldap.DialWithDialer(&dialer))
+	tlsConfig := &tls.Config{
+		ServerName:         args.Server,
+		InsecureSkipVerify: args.SkipVerify,
 	}
-	if err != nil {
-		msg.SetError(err.Error())
+
+	if args.UseTLS {
+		conn, connErr = ldap.DialURL("ldaps://"+args.Server, ldap.DialWithDialer(&dialer), ldap.DialWithTLSConfig(tlsConfig))
+	} else {
+		conn, connErr = ldap.DialURL("ldap://"+args.Server, ldap.DialWithDialer(&dialer))
+		if connErr == nil {
+			connErr = conn.StartTLS(tlsConfig)
+		}
+	}
+	if connErr != nil {
+		msg.SetError(connErr.Error())
 		task.Job.SendResponses <- msg
 		return
 	}
