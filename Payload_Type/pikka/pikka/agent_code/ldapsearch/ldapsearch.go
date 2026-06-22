@@ -96,10 +96,30 @@ func Run(task structs.Task) {
 		return
 	}
 
-	scope := ldap.ScopeWholeSubtree
 	if args.Base == "" {
-		scope = ldap.ScopeBaseObject
+		rootDSE := ldap.NewSearchRequest(
+			"",
+			ldap.ScopeBaseObject,
+			ldap.NeverDerefAliases,
+			0, 0, false,
+			"(objectClass=*)",
+			[]string{"defaultNamingContext"},
+			nil,
+		)
+		rootRes, rootErr := conn.Search(rootDSE)
+		if rootErr != nil || len(rootRes.Entries) == 0 {
+			msg.SetError("failed to query RootDSE for defaultNamingContext")
+			task.Job.SendResponses <- msg
+			return
+		}
+		args.Base = rootRes.Entries[0].GetAttributeValue("defaultNamingContext")
+		if args.Base == "" {
+			msg.SetError("RootDSE did not return a defaultNamingContext")
+			task.Job.SendResponses <- msg
+			return
+		}
 	}
+	scope := ldap.ScopeWholeSubtree
 
 	req := ldap.NewSearchRequest(
 		args.Base,

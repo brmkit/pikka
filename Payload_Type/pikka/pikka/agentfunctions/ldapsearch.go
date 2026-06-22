@@ -12,7 +12,7 @@ func init() {
 		Description:         "A simple LDAP search command",
 		Version:             2,
 		Author:              "@brmk",
-		SupportedUIFeatures: []string{"ldapsearch", "ldap_browser:view", "ldap_browser:list"},
+		SupportedUIFeatures: []string{"ldapsearch", "ldap_browser:list"},
 		CommandParameters: []agentstructs.CommandParameter{
 			{
 				Name:          "query",
