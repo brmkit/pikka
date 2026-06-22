@@ -143,5 +143,5 @@ _ReSharper*/
 
 # custom
 resources/
-Payload_Type/pikka/pikka/agent_code/pikka_http.exe
 vendor/
+TESTING.md

@@ -134,17 +134,20 @@ func buildMetadata(e *ldap.Entry) map[string]interface{} {
 	return meta
 }
 
-func getBaseDN(domain string) (string, error) {
-	if domain == "" {
-		return "", fmt.Errorf("invalid input")
+func domainFromBaseDN(base string) string {
+	if base == "" {
+		return ""
 	}
-
-	dcs := "DC=" + strings.ReplaceAll(domain, ".", ",DC=")
-
-	return strings.ToUpper(dcs), nil
+	var parts []string
+	for _, component := range strings.Split(base, ",") {
+		kv := strings.SplitN(strings.TrimSpace(component), "=", 2)
+		if len(kv) == 2 && strings.EqualFold(kv[0], "DC") {
+			parts = append(parts, kv[1])
+		}
+	}
+	return strings.ToLower(strings.Join(parts, "."))
 }
 
-// TODO: verify this function with gohawk
 func detectDC(domain string) (string, error) {
 	// input: domain name
 	// output: DC server FQDN

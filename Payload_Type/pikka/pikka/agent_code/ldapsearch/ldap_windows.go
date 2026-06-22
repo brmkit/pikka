@@ -89,29 +89,33 @@ func resolveLDAPServer() (string, error) {
 	logon := strings.TrimLeft(os.Getenv("LOGONSERVER"), "\\")
 	domain := os.Getenv("USERDNSDOMAIN")
 
-	if logon == "" || domain == "" {
-		return "", fmt.Errorf("LOGONSERVER or USERDNSDOMAIN not set")
+	if domain != "" {
+		if dc, err := detectDC(domain); err == nil && dc != "" {
+			return dc, nil
+		}
+		if logon != "" {
+			return strings.ToLower(logon + "." + domain), nil
+		}
 	}
 
-	if dc, err := detectDC(domain); err == nil && dc != "" {
-		return dc, nil
+	if logon != "" {
+		return strings.ToLower(logon), nil
 	}
 
-	// fallback to LOGONSERVER
-	return strings.ToLower(logon + "." + domain), nil
+	return "", fmt.Errorf("no LDAP server context available")
 }
 
 func ldapBind(conn *ldap.Conn, args *LdapQuery) error {
+	if args.Username != "" && args.Password != "" {
+		return conn.Bind(args.Username, args.Password)
+	}
 
-	// set SPN
 	spn := "ldap/" + args.Server
-
 	client, err := NewSSPIClient()
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
-	// use process security context
 	return conn.GSSAPIBind(client, spn, "")
 }

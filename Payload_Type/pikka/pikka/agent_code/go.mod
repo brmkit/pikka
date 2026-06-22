@@ -67,3 +67,7 @@ require (
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
 )
+
+// Workaround: chvancooten's fork implements BeaconFormat* APIs
+// PR #6 on praetorian-inc/goffloader - once merged will be removed
+replace github.com/praetorian-inc/goffloader => github.com/chvancooten/goffloader v0.0.0-20250609140752-09e3309f0a49
