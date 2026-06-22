@@ -120,15 +120,16 @@ func init() {
 		},
 		TaskFunctionParseArgDictionary: func(args *agentstructs.PTTaskMessageArgsData, input map[string]interface{}) error {
 
-			if path, ok := input["full_path"]; ok {
-				// full_path from the browser is in reversed order (DC=local,DC=example,CN=Users)
-				// reverse it back to standard DN format (CN=Users,DC=example,DC=local)
-				if p, ok := path.(string); ok && p != "" {
+			if fullPath, ok := input["full_path"]; ok {
+				if p, ok := fullPath.(string); ok && p != "" {
 					parts := strings.Split(p, ",")
 					for i, j := 0, len(parts)-1; i < j; i, j = i+1, j-1 {
 						parts[i], parts[j] = parts[j], parts[i]
 					}
 					input["base"] = strings.Join(parts, ",")
+				}
+				if _, ok := input["query"]; !ok {
+					input["query"] = "(&(objectclass=top)(objectclass=container))"
 				}
 			}
 
