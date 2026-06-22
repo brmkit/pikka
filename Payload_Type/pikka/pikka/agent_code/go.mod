@@ -70,4 +70,4 @@ require (
 
 // Workaround: chvancooten's fork implements BeaconFormat* APIs
 // PR #6 on praetorian-inc/goffloader - once merged will be removed
-replace github.com/praetorian-inc/goffloader => github.com/chvancooten/goffloader v0.0.0-20250609140752-09e3309f0a49
+replace github.com/praetorian-inc/goffloader => github.com/chvancooten/goffloader v0.0.0-20260120111402-09e3309f0a49
